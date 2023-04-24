@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    
+    
+        <meta charset="UTF-8">
+        <title>Справочник</title>
+        <!-- preload -->
+        <link rel="preload" href="/static/css/bootstrap-grid.css" as="style">
+        <link rel="preload" href="/static/js/jquery-3.3.1.js" as="script">
+        <link rel="preload" href="/static/js/popper-umd-1.14.3.js" as="script">
+        <link rel="preload" href="/static/js/bootstrap-4.1.1.js" as="script">
+        <link rel="preload" href="/static/js/fontawesome-all-5.0.12.js" as="script">
+
+        <link rel="stylesheet" href="/static/css/bootstrap-4.1.1.css">
+        <style>
+            .add-menu::after {
+                display: none;
+            }
+        </style>
+    
+    <link rel="stylesheet" href="/static/css/bootstrap-table-1.12.1.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-table-group-by.css">
+
+</head>
+<body>
+<div class="container">
+    
+    <nav id="nav-main"
+     class="navbar navbar-expand navbar-dark bg-dark sticky-top justify-content-between border border-top-0">
+    <a href="/full/"><span class="navbar-brand mb-0 h1">Служебный справочник</span></a>
+    <ul class="navbar-nav mr-auto">
+    
+        
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle add-menu" href="#" role="button" data-toggle="dropdown" title="Добавить элемент">
+                <i class="fas fa-plus-circle"></i>
+            </a>
+            <div class="dropdown-menu">
+                <div class="dropdown-header">Создать:</div>
+                <a href="/emp/add" class="dropdown-item" target="_blank">Сотрудник</a>
+                <a href="/otd_ent/add" class="dropdown-item" target="_blank">Служебная запись</a>
+            </div>
+        </li>
+        
+
+        <li class="nav-item dropdown">
+    <a href="#" class="nav-link dropdown-toggle add-menu" role="button" data-toggle="dropdown">
+        <i class="fas fa-briefcase" title="Выбрать раздел"></i>
+    </a>
+    <div class="dropdown-menu">
+        <div class="dropdown-header">Справочники:</div>
+        <a href="/" class="dropdown-item">Общий</a>
+        <a href="/full/" class="dropdown-item">Внутренний</a>
+        <div class="dropdown-divider"></div>
+        <a href="/worksystem/list" class="dropdown-item">Матрица</a>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-header">Ключи:</div>
+        <a href="/keys/cert/list" class="dropdown-item">Сертификаты</a>
+        <a href="/keys/token/list" class="dropdown-item">Токены</a>
+    </div>
+</li>
+
+        
+            <li class="nav-item"><a href="/admin/" class="nav-link"  title="Управление">
+                <i class="fas fa-cogs"></i> </a></li>
+        
+
+        <li class="nav-item"><a class="nav-link" href="/accounts/logout/" title="Выход">
+            <i class="fas fa-sign-out-alt"></i> </a></li>
+    
+</ul>
+    <div class="form-inline">
+    <div id="searchbar" data-toggle="tooltip" data-placement="left"
+         title="Введите имя/номер/название для поиска"></div>
+</div>
+</nav>
+
+
+    
+    <p style="margin-top: 12px">
+    <span class="badge badge-primary">Персональный номер</span>
+    <span class="badge badge-success">Групповой номер</span>
+</p>
+<table class="table"
+       data-sort-name="pos"
+        
+        
+        
+       data-buttons-toolbar="#searchbar"
+       data-group-by="true"
+       data-group-by-field="otdel"
+       data-pagination="false"
+       data-search="true"
+       data-toggle="table">
+    <thead>
+    <tr>
+        <th data-field="pos" data-visible="false" data-searchable="false">#</th>
+        <!-- formatted fio-->
+        <th data-width="30%" data-searchable="false">ФИО</th>
+        <!-- fio for search -->
+        <th data-visible="false"></th>
+        <th data-field="otdel" data-visible="false">Отделение</th>
+        <th>Должность</th>
+        <th>Телефон</th>
+        <th>Почта</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+        
+
+    <tr style="display: none" class="bg-danger text-white">
+        <td>10</td>
+        <td>
+        
+            <a href="/emp/1245/show" class="text-white">Воробьева Надежда Александровна (Уволен)</a>
+        
+        <!-- show_keys 1 certs: 0-->
+        
+            
+        
+        </td>
+        <td>Воробьева Надежда Александровна (Уволен) </td>
+        <td>Северный филиал</td>
+        <td>директор филиала</td>
+        <td>
+            
+
+        </td>
+        <td>
+            
+                <a href="mailto:vorobieva.n@blood.ru" class="badge badge-info">vorobieva.n@blood.ru</a>
+            
+        </td>
+    </tr>
+
+</table>
+
+</div>
+
+    
+    <script src="/static/js/jquery-3.3.1.js"></script>
+    <script src="/static/js/popper-umd-1.14.3.js"></script>
+    <script src="/static/js/bootstrap-4.1.1.js"></script>
+    <script src="/static/js/fontawesome-all-5.0.12.js"></script>
+
+    <script src="/static/js/bootstrap-table.js"></script>
+    <script src="/static/js/bootstrap-table-group-by.js"></script>
+
+
+    
+    <script>
+    setTimeout(function () {
+        $tool = $('#searchbar');
+        $tool.tooltip({
+            container: $('#nav-main')
+        });
+        $tool.tooltip('show');
+        $tool.find('input').focus();
+    }, 5000);
+</script>
+
+</body>
+</html>
