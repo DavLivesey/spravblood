@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Сотрудники НМИЦ гематологии</h1>    
+        {% for department in departments %}
+        <div><h3>{{ department }}</h3></div>
+        {% for worker in workers %}
+<table style="width:100%; height:0px;">
+
+        {% if worker[1] == department %}
+        <TR>
+        <td CLASS="name">{{ worker[0]}}</td>
+                {% if worker[2]|length < 5 %}
+                <td>{% for position in worker[2] %}
+                                <li>{{ position }}</li>
+                        {% endfor %}</td>
+                {% else %}
+                        <td><li>{{ worker[2] }}</li></td>
+                {% endif %}
+        {% if worker[3]|length < 4 %}
+                {% for position in worker[3] %}
+                        <td><li>{{ position }}</li></td>
+                {% endfor %}
+        {% else %}
+                <td><li>{{ worker[3] }}</li></td>
+        {% endif %}
+        <td><li>{{ worker[4]}}</li></td>
+        {% endif %}
+        </TR>   
+        </table>
+        {% endfor %}
+        {% endfor %}
+{% endblock %}
