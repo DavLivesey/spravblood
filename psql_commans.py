@@ -21,7 +21,7 @@ class DBCommands:
                             'join positions p on w2.pos_id = p.id '\
                             'join connections c on w.id = c.worker_id '\
                             'join phones ph on c.phone_id = ph.id '\
-                            'WHERE d.dep_name = $1'
+                            'WHERE d.dep_name LIKE $1'
     #Блок изменения информации о работниках
     ADD_NEW_WORKER = 'INSERT INTO workers (fullname) VALUES ($1)'
     ADD_DEP = 'UPDATE workers w SET "department"=$2 WHERE id=$1'
@@ -123,10 +123,10 @@ class DBCommands:
     
     async def get_workers_of_dep(self, dep):
         workers_positions = await DataBase.execute(self.GET_WORKERS_IN_DEP, dep, fetch=True)
-        
         list_result = []
         num = 0
         for worker in workers_positions:
+            print(worker)
             result = {'name': '', 'position': '', 'phone': '', 'email': ''}   
             result['name'] = worker[0]
             result['position'] = worker[1]
