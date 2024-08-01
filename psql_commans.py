@@ -15,7 +15,7 @@ class DBCommands:
     #Блок получения информации о работниках
     GET_LIST_WORKERS = 'SELECT w.fullname, w.email, w.ad FROM workers w'
     GET_LIST_DEPARTMENTS = 'SELECT dep_name FROM departments ORDER BY dep_name'
-    GET_WORKERS_IN_DEP = 'SELECT w.fullname, p.pos_name, ph.phone_number, w.email from workers w ' \
+    GET_WORKERS_IN_DEP = 'SELECT w.id, w.fullname, p.pos_name, ph.phone_number, w.email, w2.employment from workers w ' \
                             'join workplaces w2 on w.id  = w2.worker_id '\
                             'join departments d on w2.dep_id  = d.id '\
                             'join positions p on w2.pos_id = p.id '\
@@ -126,15 +126,16 @@ class DBCommands:
         list_result = []
         num = 0
         for worker in workers_positions:
-            print(worker)
-            result = {'name': '', 'position': '', 'phone': '', 'email': ''}   
-            result['name'] = worker[0]
-            result['position'] = worker[1]
-            result['phone'] = worker[2]
-            result['email'] = worker[3]
+            result = {'id': '', 'name': '', 'position': '', 'phone': '', 'email': '', 'employment': ''}   
+            result['id'] = worker[0]
+            result['name'] = worker[1]
+            result['position'] = worker[2]
+            result['phone'] = worker[3]
+            result['email'] = worker[4]
+            result['employment'] = worker[5]            
             list_result.append(result)
             num += 1
-        return (list_result)
+        return list_result
     
     async def get_list_workers(self):
         workers_list = await DataBase.execute(self.GET_LIST_WORKERS, fetch=True)
@@ -232,7 +233,7 @@ class DBCommands:
                 reading_result = await self.read_worker(work)
                 return (reading_result, position)
     
-    async def get_worker_card(self, id, user):
+    async def get_worker_card(self, id):
         #Просмотр карточки уволенного сотрудника
         arg = id
         command = self.VIEW_WORKER_ON_ID
@@ -240,6 +241,7 @@ class DBCommands:
         worker = await DataBase.execute(command, arg, fetch=True)
         position = await DataBase.execute(position_command, arg, fetch=True)
         reading_result = await self.read_worker(worker[0])
+        return worker[0]
 
 
     async def view_worker_with_id(self, fullname, user, role):
