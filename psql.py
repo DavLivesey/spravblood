@@ -1,8 +1,9 @@
 from typing import Union
 import logging
 import asyncpg
+import asyncio
 from asyncpg.pool import Pool
-from config import HOST, PG_PSWD, PG_USER
+from config import HOST, PG_PSWD, PG_USER, PG_PORT, BASE_NAME
 
 logging.basicConfig(format=u'%(filename)s [LINE:%(lineno)d] #%(levelname)-8s'
                            u'[%(asctime)s]  %(message)s',
@@ -19,7 +20,8 @@ class DataBaseClass:
             host=HOST,
             user=PG_USER,
             password=PG_PSWD,
-            database='workers'
+            port=PG_PORT,
+            database=BASE_NAME
         )
         await conn.execute(create_db_command)
         logging.info('Table was created')
@@ -31,10 +33,12 @@ class DataBaseClass:
                 host=HOST,
                 user=PG_USER,
                 password=PG_PSWD,
-                database='workers'
+                port=PG_PORT,
+                database=BASE_NAME
             )
+            print('connection established')
         finally:
-            self.pool.close()
+           await self.pool.close()
     
     async def execute(self, command: str, *args,
                       fetch: bool = False,
@@ -46,7 +50,8 @@ class DataBaseClass:
                 host=HOST,
                 user=PG_USER,
                 password=PG_PSWD,
-                database='workers'
+                port=PG_PORT,
+                database=BASE_NAME
             )
         
         if fetch:
@@ -63,3 +68,7 @@ class DataBaseClass:
         return result
 
 DataBase = DataBaseClass()
+
+
+if __name__ == "__main__":
+    asyncio.run(DataBase.create_pool())

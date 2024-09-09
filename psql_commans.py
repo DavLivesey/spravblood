@@ -15,12 +15,10 @@ class DBCommands:
     #Блок получения информации о работниках
     GET_LIST_WORKERS = 'SELECT w.fullname, w.email, w.ad FROM workers w'
     GET_LIST_DEPARTMENTS = 'SELECT dep_name FROM departments ORDER BY dep_name'
-    GET_WORKERS_IN_DEP = 'SELECT w.id, w.fullname, p.pos_name, ph.phone_number, w.email, w2.employment from workers w ' \
+    GET_WORKERS_IN_DEP = 'SELECT w.id, w.fullname, p.pos_name, w.email, w2.employment from workers w ' \
                             'join workplaces w2 on w.id  = w2.worker_id '\
                             'join departments d on w2.dep_id  = d.id '\
                             'join positions p on w2.pos_id = p.id '\
-                            'join connections c on w.id = c.worker_id '\
-                            'join phones ph on c.phone_id = ph.id '\
                             'WHERE d.dep_name LIKE $1'
     #Блок изменения информации о работниках
     ADD_NEW_WORKER = 'INSERT INTO workers (fullname) VALUES ($1)'
@@ -126,13 +124,14 @@ class DBCommands:
         list_result = []
         num = 0
         for worker in workers_positions:
+            worker_phone = await DataBase.execute(self.GET_PHONE, worker[1], fetch=True)
             result = {'id': '', 'name': '', 'position': '', 'phone': '', 'email': '', 'employment': ''}   
             result['id'] = worker[0]
             result['name'] = worker[1]
             result['position'] = worker[2]
-            result['phone'] = worker[3]
-            result['email'] = worker[4]
-            result['employment'] = worker[5]            
+            result['phone'] =  worker_phone
+            result['email'] = worker[3]
+            result['employment'] = worker[4]            
             list_result.append(result)
             num += 1
         return list_result

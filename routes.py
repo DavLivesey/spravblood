@@ -4,7 +4,7 @@ import collections
 
 db = DBCommands()
 
-main = Blueprint('main', __name__, template_folder='templates')
+main = Blueprint('main', __name__, template_folder='170809060948')
 
 class Worker:
     def __init__(self, name, department, position, phone, email):
@@ -19,7 +19,7 @@ class Worker:
 
 
 
-@main.route("/")
+@main.route("/",  methods=['GET', 'POST'])
 async def index():
     print(url_for('main.index'))
     result_departments = await db.get_dep_list()
@@ -31,8 +31,7 @@ async def index():
         employer_data = []
         pos_index = 2
         phone_index = 4
-        #print(f"Все сотрудники отдела {department}: {worker_positions}")
-        for worker in sorted(worker_positions, key=lambda x: x['name']):                
+        for worker in sorted(worker_positions, key=lambda x: x['name']):
                 #print(f"Работаем над {worker['name']}") 
                 if worker['name'] in employer_data:
                     #print(f"Нашли {worker['name']} в списке предыдущих обработанных") 
@@ -55,16 +54,17 @@ async def index():
                     workers_list.append(employer_data)
         for worker in workers_list:
             phone_list = []
-            index_list = []
             pos_list = []
+            phone_index = 0
             for phone in worker[3:-1:]:
-                try:
-                    phone_int = int(phone)
-                    index_list.append(worker.index(phone))
-                    phone_list.append(phone)                        
-                except ValueError:
-                     pass
-            for pos in worker[2:index_list[0]:]:
+                while phone_index <= len(phone):
+                    try:                    
+                        int(phone[phone_index][0])
+                        phone_list.append(phone[phone_index][0])
+                        phone_index += 1     
+                    except Exception:
+                        phone_index += 1
+            for pos in worker[2:-2:]:
                 pos_list.append(pos)
             worker_data = {'id': worker[0], 'name': worker[1], 'department': department,'position': pos_list, 'phone': phone_list, 'email': worker[-1]}
             departments.append(worker_data)
@@ -73,7 +73,7 @@ async def index():
 @main.route("/profile/<id>")
 async def view_employer_card(id):
     person = await db.get_worker_card(int(id))
-    print(person)
+    #print(person)
     access_dict = {}
     person_list = []
     access_dict['1С-Аптека'] = person[2]

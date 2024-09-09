@@ -4,7 +4,7 @@
         {% for department in departments %}
         <div><h3>{{ department }}</h3></div>
         {% for worker in workers %}
-<table style="width:80%; height:0px;">
+<table class="table" style="width:80%; height:0px;">
         {% if worker['department'] == department %}
         <TR>
         <td><a class="name" href="/profile/{{ worker.id }}">{{ worker.name}}</a></td>
