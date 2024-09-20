@@ -25,6 +25,7 @@ async def index():
     result_departments = await db.get_dep_list()
     departments = []    
     list_departments = [dep[0] for dep in result_departments]
+    phones = await db.get_list_phones()
     for department in list_departments:
         worker_positions = await db.get_workers_of_dep(department)
         workers_list = []
@@ -32,41 +33,41 @@ async def index():
         pos_index = 2
         phone_index = 4
         for worker in sorted(worker_positions, key=lambda x: x['name']):
-                #print(f"Работаем над {worker['name']}") 
                 if worker['name'] in employer_data:
-                    #print(f"Нашли {worker['name']} в списке предыдущих обработанных") 
-                    if worker['position'] in employer_data:
-                         if worker['phone'] in employer_data:
-                              continue
-                         else:
-                              employer_data.insert(phone_index, worker['phone'])
+                    if worker['position'] in employer_data:                        
+                        continue
                     else:
                          employer_data.insert(pos_index, worker['position'])
+                         pos_index += 1
                 else:
+                    pos_index = 2
                     employer_data = []
                     employer_data.append(worker['id'])
                     employer_data.append(worker['name'])
-                    employer_data.append(worker['position'])                    
-                    employer_data.append(worker['phone'])
+                    employer_data.append(worker['position'])
+                    for phone in phones:
+                        if phone[0] == worker['name']:
+                            employer_data.append(phone[1])                 
                     if worker['email'] == None:
                          worker['email'] = ''
                     employer_data.append(worker['email'])                    
                     workers_list.append(employer_data)
         for worker in workers_list:
             phone_list = []
+            pos_index = -2
             pos_list = []
-            phone_index = 0
-            for phone in worker[3:-1:]:
-                while phone_index <= len(phone):
-                    try:                    
-                        int(phone[phone_index][0])
-                        phone_list.append(phone[phone_index][0])
-                        phone_index += 1     
-                    except Exception:
-                        phone_index += 1
-            for pos in worker[2:-2:]:
-                pos_list.append(pos)
-            worker_data = {'id': worker[0], 'name': worker[1], 'department': department,'position': pos_list, 'phone': phone_list, 'email': worker[-1]}
+            for phone in worker[-2:2:-1]:
+                try:
+                    result_phone = int(phone)
+                    if len(str(phone)) > 4:
+                        result_phone = f'+{phone}'
+                    phone_list.append(result_phone)
+                    pos_index -= 1
+                except ValueError:
+                    continue
+            pos_list = worker[pos_index:1:-1]
+            worker_data = {'id': worker[0], 'name': worker[1], 'department': department,'position': pos_list, \
+                           'phone': phone_list, 'email': worker[-1]}
             departments.append(worker_data)
     return render_template('index.html', departments=list_departments, workers=departments)
 

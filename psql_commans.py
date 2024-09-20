@@ -15,7 +15,7 @@ class DBCommands:
     #Блок получения информации о работниках
     GET_LIST_WORKERS = 'SELECT w.fullname, w.email, w.ad FROM workers w'
     GET_LIST_DEPARTMENTS = 'SELECT dep_name FROM departments ORDER BY dep_name'
-    GET_WORKERS_IN_DEP = 'SELECT w.id, w.fullname, p.pos_name, w.email, w2.employment from workers w ' \
+    GET_WORKERS_IN_DEP = 'SELECT w.id, w.fullname, p.pos_name, w.email, w2.employment, w2.expired from workers w ' \
                             'join workplaces w2 on w.id  = w2.worker_id '\
                             'join departments d on w2.dep_id  = d.id '\
                             'join positions p on w2.pos_id = p.id '\
@@ -59,9 +59,12 @@ class DBCommands:
     ADD_NEW_PHONE = 'INSERT INTO phones (phone_number) VALUES ($1)'
     ADD_PHONE = 'INSERT INTO connections (worker_id, phone_id) '\
                 'VALUES ($1, (select id FROM phones WHERE phones.phone_number=$2))'
-    GET_PHONE = 'SELECT p.phone_number FROM connections c '\
+    GET_PHONE = 'SELECT fullname, phone_number FROM phones p '\
+                  'JOIN connections c ON p.id =c.phone_id '\
+                  'JOIN workers w ON c.worker_id = w.id'
+    GET_EMP_PHONE = 'SELECT phone_number FROM phones p '\
+                  'JOIN connections c ON p.id =c.phone_id '\
                   'JOIN workers w ON c.worker_id = w.id '\
-                  'JOIN phones p ON c.phone_id =p.id '\
                   'WHERE w.fullname = $1'
     CHECK_PHONE = 'SELECT EXISTS (SELECT p.phone_number FROM connections c '\
                   'JOIN workers w ON c.worker_id = w.id '\
@@ -124,12 +127,14 @@ class DBCommands:
         list_result = []
         num = 0
         for worker in workers_positions:
-            worker_phone = await DataBase.execute(self.GET_PHONE, worker[1], fetch=True)
-            result = {'id': '', 'name': '', 'position': '', 'phone': '', 'email': '', 'employment': ''}   
+            if worker[5] == True:
+                continue
+            phone_list = []
+            #print(phone_list)
+            result = {'id': '', 'name': '', 'position': '', 'email': '', 'employment': ''}   
             result['id'] = worker[0]
             result['name'] = worker[1]
             result['position'] = worker[2]
-            result['phone'] =  worker_phone
             result['email'] = worker[3]
             result['employment'] = worker[4]            
             list_result.append(result)
@@ -139,6 +144,10 @@ class DBCommands:
     async def get_list_workers(self):
         workers_list = await DataBase.execute(self.GET_LIST_WORKERS, fetch=True)
         return workers_list
+    
+    async def get_list_phones(self):
+        phones_list = await DataBase.execute(self.GET_PHONE, fetch=True)
+        return phones_list
     
     async def get_old_mailbox(self, fullname):
         command = self.CHECK_OLD_MAILBOXES
@@ -162,7 +171,7 @@ class DBCommands:
         #3.list_sert - список сертификатов работника
         #5.sec_list - список закрытых контактов (учетка в компьютер, участие в почтовых рассылках)
             phone_arg = person[1]
-            phone_command = self.GET_PHONE
+            phone_command = self.GET_EMP_PHONE
             phone_list = []
             telephones = await DataBase.execute(phone_command, phone_arg, fetch=True)
             mailbox_arg = person[1]
